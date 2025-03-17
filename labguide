@@ -1,0 +1,573 @@
+Show all databases
+===================
+To see all available databases, in your terminal type show dbs
+
+> Show dbs
+
+
+Change or Create a Database
+===========================
+You can change or create a new database by typing use then the name of the database.
+Create a new database called "blog":
+
+> use blog
+
+Remember: In MongoDB, a database is not actually created until it gets content!
+
+Create Collection (Method 1)
+============================
+> db.createCollection("posts")  
+
+
+Create Collection (Method 2)
+============================
+> db.posts.insertOne({"title": "Post 1"}) 
+
+
+Show Collections
+================
+> show collections
+
+
+Delete/Drop Collection
+======================
+> db.posts.drop()
+
+
+Delete/Drop Database
+====================
+> db.dropDatabase()
+
+
+Clear Screen
+===========
+cls
+
+Create Collection
+==================
+db.createCollection('posts')
+
+
+Insert Documents
+=================
+To insert a single document, use the insertOne() method.
+
+> db.posts.insertOne({
+  title: "Post Title 1 - one",
+  body: "Body of post.",
+  category: "News",
+  likes: 1,
+  tags: ["news", "events"],
+  date: Date()
+}) 
+
+
+            
+insertMany()
+============
+To insert multiple documents at once, use the insertMany() method.
+This method inserts an array of objects into the database.
+
+> db.posts.insertMany([  
+  {
+    title: "Post Title 2 - two",
+    body: "Body of post.",
+    category: "Event",
+    likes: 2,
+    tags: ["news", "events"],
+    date: Date()
+  },
+  {
+    title: "Post Title 3 - three",
+    body: "Body of post.",
+    category: "Technology",
+    likes: 3,
+    tags: ["news", "events"],
+    date: Date()
+  },
+  {
+    title: "Post Title 4 - Four",
+    body: "Body of post.",
+    category: "Event",
+    likes: 4,
+    tags: ["news", "events"],
+    date: Date()
+  }
+]) 
+
+
+
+Find Data
+==========
+find()
+======
+To select data from a collection in MongoDB, we can use the find() method.
+This method accepts a query object. If left empty, all documents will be returned.
+
+> db.posts.find()
+
+
+findOne()
+=========
+To select only one document, we can use the findOne() method.
+This method accepts a query object. If left empty, it will return the first document it finds.
+Note: This method only returns the first match it finds.
+
+> db.posts.findOne()
+
+
+find().limit(2)
+================
+To select first 2 documents from the collection
+> db.posts.find().limit(2)
+
+
+Querying Data
+==============
+To query, or filter, data we can include a query in our find() or findOne() methods.
+
+> db.posts.find( {category: "News"} )
+> db.posts.find( { title: "Post Title 1" } )
+
+
+Projection
+============
+Both find methods accept a second parameter called projection.
+This parameter is an object that describes which fields to include in the results.
+Note: This parameter is optional. If omitted, all fields will be included in the results.
+
+> db.posts.find({}, {title: 1, date: 1})
+
+Let's exclude the date category field. All other fields will be included in the results.
+> db.posts.find({}, {category: 0})
+
+
+Update Document
+===============
+To update an existing document we can use the updateOne() or updateMany() methods.
+The first parameter is a query object to define which document or documents should be updated.
+The second parameter is an object defining the updated data.
+
+updateOne()
+===========
+The updateOne() method will update the first document that is found matching the provided query.
+Let's see what the "like" count for the post with the title of "Post Title 1":
+
+> db.posts.updateOne( { title: "Post Title 1" }, { $set: { likes: 2 } } )
+> db.posts.find( { title: "Post Title 1" } )
+
+
+Insert if not found
+====================
+If you would like to insert the document if it is not found, you can use the upsert option.
+         
+db.posts.updateOne( 
+  { title: "Post Title 5" }, 
+  {
+    $set: 
+      {
+        title: "Post Title 5",
+        body: "Body of post.",
+        category: "Event",
+        likes: 5,
+        tags: ["news", "events"],
+        date: Date()
+      }
+  }, 
+  { upsert: true }
+) 
+
+updateMany()
+============
+The updateMany() method will update all documents that match the provided query.
+> db.posts.updateMany({}, { $inc: { likes: 1 } }) 
+
+Now check the likes in all of the documents and you will see that they have all been incremented by 1.
+
+MongoDB Update Operators
+========================
+Field Update Operators:
+$set (Update or add a field)
+==============================
+Update the category of a post where title is "Post Title 2":
+> db.posts.updateOne({ title: "Post Title 2" }, { $set: { category: "Updated Event" } })
+
+$unset (Remove a field)
+========================
+Remove the tags field from a post:
+> db.posts.updateOne({ title: "Post Title 2" }, { $unset: { tags: "" } })
+
+$rename (Rename a field)
+===========================
+Rename the body field to content:
+> db.posts.updateMany({}, { $rename: { body: "content" } })
+
+
+Array Update Operators
+========================
+$push (Add value to an array)
+===============================
+Add a new tag "latest" to the tags array:
+> db.posts.updateOne({ title: "Post Title 2" }, { $push: { tags: "latest" } })
+
+$addToSet (Add unique value to an array)
+========================================
+Only add "breaking-news" if it does not already exist:
+> db.posts.updateOne({ title: "Post Title 2" }, { $addToSet: { tags: "breaking-news" } })
+
+$pull (Remove a specific value from an array)
+=============================================
+Remove "news" from tags:
+> db.posts.updateOne({ title: "Post Title 2" }, { $pull: { tags: "news" } })
+
+$pop (Remove first or last element)
+=====================================
+Remove the last element from tags:
+> db.posts.updateOne({ title: "Post Title 2" }, { $pop: { tags: 1 } })
+
+
+Remove the first element from tags:
+====================================
+> db.posts.updateOne({ title: "Post Title 2" }, { $pop: { tags: -1 } })
+
+Bulk Update (updateMany)
+===========================
+Update all posts in the "Event" category by increasing likes by 1:
+db.posts.updateMany({ category: "Event" }, { $inc: { likes: 1 } })
+
+
+Delete Documents
+=================
+We can delete documents by using the methods deleteOne() or deleteMany().
+These methods accept a query object. The matching documents will be deleted.
+
+deleteOne()
+===========
+The deleteOne() method will delete the first document that matches the query provided.
+> db.posts.deleteOne({ title: "Post Title 5" })
+
+deleteMany()
+==============
+The deleteMany() method will delete all documents that match the query provided.
+> db.posts.deleteMany({ category: "Technology" })
+
+MongoDB Query Operators
+=======================
+Comparison Operators
+The following operators can be used in queries to compare values:
+
+$eq: Values are equal
+$ne: Values are not equal
+$gt: Value is greater than another value
+$gte: Value is greater than or equal to another value
+$lt: Value is less than another value
+$lte: Value is less than or equal to another value
+$in: Value is matched within an array
+
+> db.posts.find({ likes: { $eq: 3 } })
+> db.posts.find({ category: { $ne: "Event" } })
+> db.posts.find({ likes: { $gt: 2 } })
+> db.posts.find({ likes: { $gte: 3 } })
+> db.posts.find({ likes: { $lt: 4 } })
+> db.posts.find({ likes: { $lte: 2 } })
+> db.posts.find({ category: { $in: ["Event", "Technology"] } })
+> db.posts.find({ category: { $nin: ["Event", "Technology"] } })
+
+
+Logical Operators
+==================
+The following operators can logically compare multiple queries.
+> $and: Returns documents where both queries match
+> $or: Returns documents where either query matches
+> $nor: Returns documents where both queries fail to match
+> $not: Returns documents where the query does not match
+
+> db.posts.find({ $and: [{ category: "Event" }, { likes: { $gt: 2 } }] })
+> db.posts.find({ $or: [{ category: "Event" }, { likes: { $gt: 3 } }] })
+> db.posts.find({ $nor: [{ category: "Event" }, { likes: { $gt: 3 } }] })
+> db.posts.find({ likes: { $not: { $gt: 2 } } })
+
+
+Evaluation
+===========
+The following operators assist in evaluating documents.
+$regex: Allows the use of regular expressions when evaluating field values
+$text: Performs a text search
+$where: Uses a JavaScript expression to match documents
+
+> db.posts.find({
+  title: {
+    $regex: "Title",
+    $options: "i"
+  }
+})
+
+
+> db.posts.find({
+  title: {
+    $regex: "Title",
+    $options: "i"
+  }
+});
+
+
+
+
+> db.posts.find({ title: { $regex: "Title", $options: "i" } })
+> db.posts.find({ $expr: { $gt: ["$likes", 2] } })
+> db.posts.find({ likes: { $mod: [2, 0] } })
+> db.posts.find({ likes: { $type: "number" } })
+
+
+> db.posts.createIndex({ title: "text", body: "text" })
+> db.posts.find({ $text: { $search: "Post" } })
+> db.posts.find({ $text: { $search: "Post Event" } })
+> db.posts.find({ $text: { $search: "\"Post Event\"" } })
+> db.posts.find({ $text: { $search: "Post -Event" } })
+> db.posts.find({ $where: "this.likes > 2" })
+> db.posts.find({ $where: "this.category == 'Event' && this.likes % 2 == 0" })
+> db.posts.find({ $where: "this.title.indexOf('Post') !== -1" })
+
+
+Aggregation Pipelines
+======================
+Aggregation operations allow you to group, sort, perform calculations, analyze data, and much more.
+Aggregation pipelines can have one or more "stages". The order of these stages are important. Each stage acts upon the results of the previous stage.
+Create a new collection and import documents via MongoDB Compass
+
+Create a collection by the name ‘users’ under ‘blog’ database and insert the list of documents from the below link to the collection
+
+https://gist.githubusercontent.com/hiteshchoudhary/a80d86b50a5d9c591198a23d79e1e467/raw/a9d8022cf95dee0de47efad29697fecea05f9a23/data.json
+
+
+How many active users in the database ?
+
+> db.users.aggregate([
+    {$match: {
+      isActive: true
+    }},
+    {
+        $count: 'active_users_count'
+    }
+
+])
+
+
+What's the average age of the users ?
+
+> db.users.aggregate([
+{
+    $group: {
+      _id: null,
+      average_age:{
+        $avg: '$age'
+      }
+
+    }
+},
+
+])
+
+
+
+What’s  average age of male and female users
+
+> db.users.aggregate([
+{
+    $group: {
+      _id: '$gender',
+      average_user:{
+        $avg: '$age'
+      }
+    },
+
+},
+
+])
+
+
+
+
+
+What's the most common fruit among the users.
+
+> db.users.aggregate([
+{
+    $group: {
+      _id: '$favoriteFruit',
+      count: {
+        '$sum': 1
+      }
+    }
+},
+
+{
+    $sort: {
+        count: -1
+    }
+},
+
+{
+    $limit: 1
+}
+])
+
+
+
+What's the least common fruit among the users?
+
+> db.users.aggregate([
+{
+    $group: {
+      _id: '$favoriteFruit',
+      count: {
+        '$sum': 1
+      }
+    }
+},
+
+{
+    $sort: {
+        count: 1
+    }
+},
+
+{
+    $limit: 1
+}
+])
+
+
+7. What's the least common fruit among the users?
+
+> db.users.aggregate([
+{
+    $group: {
+      _id: '$favoriteFruit',
+      count: {
+        '$sum': 1
+      }
+    }
+},
+
+{
+    $sort: {
+        count: 1
+    }
+},
+
+{
+    $limit: 1
+}
+])
+
+
+
+8. Find the total number of male and female users
+
+> db.users.aggregate([
+{
+    $group:{
+        _id: '$gender',
+        count: {
+            $sum: 1
+        }
+    }
+}
+])
+
+
+
+9. Which country has the highest number of registered users ?
+
+> db.users.aggregate([
+{
+    $group:{
+        _id: '$company.location.country',
+        count: {
+            $sum: 1
+        }
+    }
+},
+{
+    $sort: {
+        count: -1
+    }
+},
+{
+    $limit: 1
+}
+])
+
+
+10. List all the unique eye colors present in the collection.
+
+> db.users.aggregate([
+{
+    $group:{
+        _id: '$eyeColor',
+    }
+},
+
+])
+
+
+11. What’s the average number of tags per user ?
+
+> db.users.aggregate([
+{
+  $addFields: {
+    num_of_tags: {
+        $size: {
+            $ifNull: ['$tags', []]
+        }
+    }
+  },
+},
+{
+    $group : {
+        _id : null,
+        average_number_of_tags: {
+            $avg: '$num_of_tags'
+        }
+    }
+}
+
+])
+
+
+
+12. How many users have ‘enim’ as one of their tags?
+
+> db.users.aggregate([
+{
+    $match:{
+        tags: 'enim'
+    }
+},
+{
+    $count: 'usersWithEnimTag'
+}
+])
+
+
+
+13. What are the names and age of users who are inactive and have ‘velit’ as a tag?
+
+> db.users.aggregate([
+{
+    $match: {
+      isActive: false,
+      tags: 'velit'
+    }
+},
+{
+    $project:{
+        name: 1,
+        age: 1,
+        _id: 0
+    }
+}
+])
+
+
