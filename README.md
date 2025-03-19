@@ -15,3 +15,8 @@
  - MongoDB Data API
  - MongoDB Replication
 
+## MongoDB Lab
+ - Working with MongoDB cloud instance
+ - Working with MongoDB locally installed instance
+ - MongoDB shell
+ - Python pymongo api
