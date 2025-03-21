@@ -277,10 +277,10 @@ $in: Value is matched within an array
 Logical Operators
 ==================
 The following operators can logically compare multiple queries.
-> $and: Returns documents where both queries match
-> $or: Returns documents where either query matches
-> $nor: Returns documents where both queries fail to match
-> $not: Returns documents where the query does not match
+$and: Returns documents where both queries match
+$or: Returns documents where either query matches
+$nor: Returns documents where both queries fail to match
+$not: Returns documents where the query does not match
 
 > db.posts.find({ $and: [{ category: "Event" }, { likes: { $gt: 2 } }] })
 > db.posts.find({ $or: [{ category: "Event" }, { likes: { $gt: 3 } }] })
