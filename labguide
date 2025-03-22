@@ -2,7 +2,7 @@ Show all databases
 ===================
 To see all available databases, in your terminal type show dbs
 
-> Show dbs
+> show dbs
 
 
 Change or Create a Database
